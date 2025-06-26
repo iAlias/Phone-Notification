@@ -1,0 +1,11 @@
+{
+    "name": "Phone Notifications Logger",
+    "domain": "phone_notifications_logger",
+    "homeassistant": "2024.0.0",
+    "render_readme": true,
+    "zip_release": false,
+    "filename": "custom_components/phone_notifications_logger/__init__.py",
+    "country": [
+        "IT"
+    ]
+}

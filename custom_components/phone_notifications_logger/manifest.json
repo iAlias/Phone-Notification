@@ -1,0 +1,11 @@
+{
+    "domain": "phone_notifications_logger",
+    "name": "Phone Notifications Logger",
+    "version": "0.1.0",
+    "documentation": "https://github.com/your_github_username/phone_notifications_logger",
+    "dependencies": [],
+    "requirements": [],
+    "codeowners": [
+        "@your_github_username"
+    ]
+}
