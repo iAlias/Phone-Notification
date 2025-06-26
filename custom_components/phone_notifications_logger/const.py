@@ -1,5 +1,3 @@
-"""Costanti per l'integrazione Phone Notifications Logger."""
-
 DOMAIN = "phone_notifications_logger"
 STORAGE_KEY = f"{DOMAIN}_{{}}.json"
 

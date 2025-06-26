@@ -1,5 +1,3 @@
-"""Sensore che registra lo storico delle notifiche provenienti dal telefono."""
-
 from __future__ import annotations
 
 import logging
@@ -22,7 +20,6 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Configura la piattaforma del sensore."""
     entity_id = config.get(CONF_SENSOR)
     name = config.get(CONF_NAME, "Phone Notifications")
     max_history = config.get(CONF_MAX_HISTORY, 1000)
@@ -36,8 +33,6 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 
 class PhoneNotificationsSensor(Entity):
-    """Entity che ascolta gli aggiornamenti del sensore Android e salva lo storico."""
-
     def __init__(self, hass, name: str, entity_id: str, max_history: int) -> None:
         self.hass = hass
         self._name = name
@@ -48,10 +43,7 @@ class PhoneNotificationsSensor(Entity):
         self._state: str | None = None
         self._attr_icon = "mdi:cellphone-text"
 
-        # Carica lo storico salvato
         hass.loop.create_task(self._async_load())
-
-        # Ascolta i cambiamenti del sensore di origine
         async_track_state_change_event(hass, [entity_id], self._state_changed)
 
     async def _async_load(self) -> None:
@@ -59,7 +51,6 @@ class PhoneNotificationsSensor(Entity):
         if saved:
             self._notifications = saved.get("notifications", [])
 
-    # Proprietà Entity di base
     @property
     def name(self) -> str:
         return self._name
@@ -73,6 +64,7 @@ class PhoneNotificationsSensor(Entity):
         return {
             "history_count": len(self._notifications),
             "last_notification": self._notifications[-1] if self._notifications else None,
+            "notifications": self._notifications,
         }
 
     @callback
@@ -86,7 +78,7 @@ class PhoneNotificationsSensor(Entity):
         text = attrs.get("android.text")
 
         if not title and not text:
-            return  # Nessuna notifica utile
+            return
 
         notification = {
             "timestamp": datetime.utcnow().isoformat(timespec="seconds"),
@@ -95,14 +87,10 @@ class PhoneNotificationsSensor(Entity):
         }
 
         self._state = title or text or "Notifica"
-
         self._notifications.append(notification)
 
-        # Mantieni solo lo storico massimo
         if len(self._notifications) > self._max_history:
             self._notifications = self._notifications[-self._max_history :]
 
         self.async_write_ha_state()
-
-        # Salva in modo persistente
         await self._store.async_save({"notifications": self._notifications})
